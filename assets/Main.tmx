@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="64" tileheight="64" infinite="1" nextlayerid="2" nextobjectid="1">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="64" tileheight="64" infinite="1" nextlayerid="3" nextobjectid="6">
  <tileset firstgid="1" source="Terrain/Tileset/Tilemap_color1.tsx"/>
  <tileset firstgid="55" source="Terrain/Tileset/Tilemap_color2.tsx"/>
  <tileset firstgid="109" source="Terrain/Tileset/Tilemap_color3.tsx"/>
@@ -27,4 +27,66 @@
 </chunk>
   </data>
  </layer>
+ <objectgroup id="2" name="Animations">
+  <object id="1" name="Idle" class="Animation" x="0" y="0">
+   <properties>
+    <property name="image" type="file" value="Units/Black Units/Warrior/Warrior_Idle.png"/>
+    <property name="frame_width" type="int" value="192"/>
+    <property name="frame_height" type="int" value="192"/>
+    <property name="columns" type="int" value="8"/>
+    <property name="first" type="int" value="0"/>
+    <property name="last" type="int" value="7"/>
+    <property name="fps" type="int" value="10"/>
+    <property name="looping" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="2" name="Run" class="Animation" x="0" y="0">
+   <properties>
+    <property name="image" type="file" value="Units/Black Units/Warrior/Warrior_Run.png"/>
+    <property name="frame_width" type="int" value="192"/>
+    <property name="frame_height" type="int" value="192"/>
+    <property name="columns" type="int" value="6"/>
+    <property name="first" type="int" value="0"/>
+    <property name="last" type="int" value="5"/>
+    <property name="fps" type="int" value="10"/>
+    <property name="looping" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="3" name="Guard" class="Animation" x="0" y="0">
+   <properties>
+    <property name="image" type="file" value="Units/Black Units/Warrior/Warrior_Guard.png"/>
+    <property name="frame_width" type="int" value="192"/>
+    <property name="frame_height" type="int" value="192"/>
+    <property name="columns" type="int" value="6"/>
+    <property name="first" type="int" value="0"/>
+    <property name="last" type="int" value="5"/>
+    <property name="fps" type="int" value="10"/>
+    <property name="looping" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="4" name="Attack1" class="Animation" x="0" y="0">
+   <properties>
+    <property name="image" type="file" value="Units/Black Units/Warrior/Warrior_Attack1.png"/>
+    <property name="frame_width" type="int" value="192"/>
+    <property name="frame_height" type="int" value="192"/>
+    <property name="columns" type="int" value="4"/>
+    <property name="first" type="int" value="0"/>
+    <property name="last" type="int" value="3"/>
+    <property name="fps" type="int" value="10"/>
+    <property name="looping" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="5" name="Attack2" class="Animation" x="0" y="0">
+   <properties>
+    <property name="image" type="file" value="Units/Black Units/Warrior/Warrior_Attack2.png"/>
+    <property name="frame_width" type="int" value="192"/>
+    <property name="frame_height" type="int" value="192"/>
+    <property name="columns" type="int" value="4"/>
+    <property name="first" type="int" value="0"/>
+    <property name="last" type="int" value="3"/>
+    <property name="fps" type="int" value="10"/>
+    <property name="looping" type="bool" value="false"/>
+   </properties>
+  </object>
+ </objectgroup>
 </map>

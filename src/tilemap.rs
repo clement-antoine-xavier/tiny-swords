@@ -56,12 +56,12 @@ fn base_path() -> PathBuf {
 }
 
 /// Absolute path to the `assets/` directory.
-fn assets_dir() -> PathBuf {
+pub(crate) fn assets_dir() -> PathBuf {
     base_path().join(ASSET_DIR)
 }
 
 /// Parses the Tiled map into the [`LevelMap`] resource.
-fn load_map(mut commands: Commands) {
+pub(crate) fn load_map(mut commands: Commands) {
     let map_path = assets_dir().join(MAP_FILE);
     match tiled::Loader::new().load_tmx_map(&map_path) {
         Ok(map) => {
@@ -112,17 +112,23 @@ fn spawn_tiled_map(
     let origin_x = -(map.width as f32 - 1.0) * tile_width / 2.0;
     let origin_y = (map.height as f32 - 1.0) * tile_height / 2.0;
 
-    // Layers are listed bottom-first, so later layers draw on top. The whole
-    // stack is kept below the player (spawned at z = 1.0) by placing the top
-    // layer at z = -1.0 and stacking downward.
-    let layer_count = map.layers().len() as f32;
+    // Layers are listed bottom-first, so later layers draw on top. Only tile
+    // layers are emitted, so the stack is numbered by tile layers alone (object
+    // layers such as the animation library must not shift it). The whole stack
+    // is kept below the player (spawned at z = 1.0) by placing the top tile layer
+    // at z = -1.0 and stacking downward.
+    let tile_layer_count = map
+        .layers()
+        .filter(|layer| layer.visible && layer.as_tile_layer().is_some())
+        .count() as f32;
 
     let tilesets = build_tileset_assets(map, &asset_server, &mut layouts, &assets_dir());
 
     let origin = Vec2::new(origin_x, origin_y);
     let tile_size = Vec2::new(tile_width, tile_height);
 
-    for (depth, layer) in map.layers().enumerate() {
+    let mut tile_depth = 0;
+    for layer in map.layers() {
         if !layer.visible {
             continue;
         }
@@ -130,7 +136,8 @@ fn spawn_tiled_map(
             continue;
         };
 
-        let z = -(layer_count - depth as f32);
+        let z = -(tile_layer_count - tile_depth as f32);
+        tile_depth += 1;
 
         // Finite layers are a fixed grid; infinite layers store tiles in 16x16
         // chunks with no overall bounds, so walk the chunks that exist.
@@ -235,7 +242,7 @@ fn build_tileset_assets(
 
 /// Converts a Tiled image path (resolved against the map file) into a path the
 /// [`AssetServer`] understands, i.e. relative to the `assets/` root.
-fn asset_path(assets_dir: &Path, source: &Path) -> PathBuf {
+pub(crate) fn asset_path(assets_dir: &Path, source: &Path) -> PathBuf {
     source
         .strip_prefix(assets_dir)
         .map(Path::to_path_buf)

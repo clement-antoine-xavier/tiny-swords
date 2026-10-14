@@ -2,19 +2,17 @@
 
 use bevy::prelude::*;
 
-use crate::animation::{AnimId, AnimationConfig};
+use crate::animation::{AnimationConfig, AnimationLibrary};
 
 /// Movement speed in pixels per second.
 const SPEED: f32 = 160.0;
 
-/// Every Warrior sprite sheet uses 192x192 frames.
-const FRAME_SIZE: UVec2 = UVec2::splat(192);
-
-const IDLE_FRAMES: u32 = 8;
-const RUN_FRAMES: u32 = 6;
-const GUARD_FRAMES: u32 = 6;
-const ATTACK1_FRAMES: u32 = 4;
-const ATTACK2_FRAMES: u32 = 4;
+/// Clip names as authored in the Tiled `Animations` layer (`assets/Main.tmx`).
+const IDLE: &str = "Idle";
+const RUN: &str = "Run";
+const GUARD: &str = "Guard";
+const ATTACK1: &str = "Attack1";
+const ATTACK2: &str = "Attack2";
 
 #[derive(Component)]
 pub struct Player;
@@ -37,73 +35,42 @@ pub struct Action {
     state: ActionState,
 }
 
-/// Texture and atlas handles shared by every player animation.
-#[derive(Resource)]
-struct PlayerAssets {
-    idle_image: Handle<Image>,
-    run_image: Handle<Image>,
-    guard_image: Handle<Image>,
-    attack1_image: Handle<Image>,
-    attack2_image: Handle<Image>,
-    idle_layout: Handle<TextureAtlasLayout>,
-    run_layout: Handle<TextureAtlasLayout>,
-    guard_layout: Handle<TextureAtlasLayout>,
-    attack1_layout: Handle<TextureAtlasLayout>,
-    attack2_layout: Handle<TextureAtlasLayout>,
-}
-
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, (setup_assets, spawn_player).chain())
-            .add_systems(
-                Update,
-                (read_move_input, resolve_action, apply_movement, update_animation).chain(),
-            );
+        app.add_systems(
+            Startup,
+            // The animation library is parsed from Tiled before the player uses it.
+            spawn_player.after(crate::animation::build_animation_library),
+        )
+        .add_systems(
+            Update,
+            (read_move_input, resolve_action, apply_movement, update_animation).chain(),
+        );
     }
 }
 
-fn setup_assets(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-) {
-    let row = |columns: u32| TextureAtlasLayout::from_grid(FRAME_SIZE, columns, 1, None, None);
+/// Spawns the Warrior, playing the `Idle` clip defined in Tiled.
+fn spawn_player(mut commands: Commands, library: Res<AnimationLibrary>) {
+    let Some(clip) = library.get(IDLE) else {
+        error!("animation `{IDLE}` is not defined in Tiled's `Animations` layer");
+        return;
+    };
 
-    let idle_layout = atlas_layouts.add(row(IDLE_FRAMES));
-    let run_layout = atlas_layouts.add(row(RUN_FRAMES));
-    let guard_layout = atlas_layouts.add(row(GUARD_FRAMES));
-    let attack1_layout = atlas_layouts.add(row(ATTACK1_FRAMES));
-    let attack2_layout = atlas_layouts.add(row(ATTACK2_FRAMES));
-
-    commands.insert_resource(PlayerAssets {
-        idle_image: asset_server.load("Units/Black Units/Warrior/Warrior_Idle.png"),
-        run_image: asset_server.load("Units/Black Units/Warrior/Warrior_Run.png"),
-        guard_image: asset_server.load("Units/Black Units/Warrior/Warrior_Guard.png"),
-        attack1_image: asset_server.load("Units/Black Units/Warrior/Warrior_Attack1.png"),
-        attack2_image: asset_server.load("Units/Black Units/Warrior/Warrior_Attack2.png"),
-        idle_layout,
-        run_layout,
-        guard_layout,
-        attack1_layout,
-        attack2_layout,
-    });
-}
-
-fn spawn_player(mut commands: Commands, assets: Res<PlayerAssets>) {
+    let mut sprite = Sprite {
+        image: clip.image.clone(),
+        texture_atlas: Some(TextureAtlas {
+            layout: clip.layout.clone(),
+            index: clip.first,
+        }),
+        ..default()
+    };
     let mut animation = AnimationConfig::default();
-    animation.play(AnimId::Idle);
+    animation.play(IDLE, clip, &mut sprite);
 
     commands.spawn((
-        Sprite {
-            image: assets.idle_image.clone(),
-            texture_atlas: Some(TextureAtlas {
-                layout: assets.idle_layout.clone(),
-                index: 0,
-            }),
-            ..default()
-        },
+        sprite,
         Transform::from_xyz(0.0, 0.0, 1.0),
         Player,
         Velocity::default(),
@@ -203,33 +170,25 @@ fn apply_movement(
     }
 }
 
-/// Maps the current action (and movement) onto an animation, swapping sheets on change.
+/// Maps the current action (and movement) onto a Tiled animation clip.
 fn update_animation(
-    assets: Res<PlayerAssets>,
+    library: Res<AnimationLibrary>,
     mut query: Query<(&Velocity, &Action, &mut AnimationConfig, &mut Sprite), With<Player>>,
 ) {
     for (velocity, action, mut config, mut sprite) in &mut query {
-        let anim = match action.state {
-            ActionState::Locomotion if velocity.0 == Vec2::ZERO => AnimId::Idle,
-            ActionState::Locomotion => AnimId::Run,
-            ActionState::Guard => AnimId::Guard,
-            ActionState::Attack { step: 0 } => AnimId::Attack1,
-            ActionState::Attack { .. } => AnimId::Attack2,
+        let name = match action.state {
+            ActionState::Locomotion if velocity.0 == Vec2::ZERO => IDLE,
+            ActionState::Locomotion => RUN,
+            ActionState::Guard => GUARD,
+            ActionState::Attack { step: 0 } => ATTACK1,
+            ActionState::Attack { .. } => ATTACK2,
         };
 
-        if !config.play(anim) {
+        let Some(clip) = library.get(name) else {
+            warn_once!("animation `{name}` is not defined in Tiled's `Animations` layer");
             continue;
-        }
-
-        let (image, layout) = match anim {
-            AnimId::Idle => (assets.idle_image.clone(), assets.idle_layout.clone()),
-            AnimId::Run => (assets.run_image.clone(), assets.run_layout.clone()),
-            AnimId::Guard => (assets.guard_image.clone(), assets.guard_layout.clone()),
-            AnimId::Attack1 => (assets.attack1_image.clone(), assets.attack1_layout.clone()),
-            AnimId::Attack2 => (assets.attack2_image.clone(), assets.attack2_layout.clone()),
         };
 
-        sprite.image = image;
-        sprite.texture_atlas = Some(TextureAtlas { layout, index: 0 });
+        config.play(name, clip, &mut sprite);
     }
 }

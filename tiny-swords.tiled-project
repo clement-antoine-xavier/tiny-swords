@@ -10,5 +10,52 @@
     "properties": [
     ],
     "propertyTypes": [
+        {
+            "id": 1,
+            "name": "Animation",
+            "type": "class",
+            "members": [
+                {
+                    "name": "image",
+                    "type": "file",
+                    "value": ""
+                },
+                {
+                    "name": "frame_width",
+                    "type": "int",
+                    "value": 192
+                },
+                {
+                    "name": "frame_height",
+                    "type": "int",
+                    "value": 192
+                },
+                {
+                    "name": "columns",
+                    "type": "int",
+                    "value": 1
+                },
+                {
+                    "name": "first",
+                    "type": "int",
+                    "value": 0
+                },
+                {
+                    "name": "last",
+                    "type": "int",
+                    "value": 0
+                },
+                {
+                    "name": "fps",
+                    "type": "int",
+                    "value": 10
+                },
+                {
+                    "name": "looping",
+                    "type": "bool",
+                    "value": true
+                }
+            ]
+        }
     ]
 }
