@@ -14,7 +14,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7.0.1
+
+    # Bevy pulls in winit (Wayland + X11), ALSA and udev, so the Linux build
+    # needs their native dev packages. See Bevy's docs/linux_dependencies.md.
+    - name: Install Linux dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          g++ pkg-config \
+          libx11-dev libxkbcommon-x11-0 \
+          libasound2-dev libudev-dev \
+          libwayland-dev libxkbcommon-dev
+
+    - name: Set up Rust
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache Rust artifacts
+      uses: Swatinem/rust-cache@v2
+
     - name: Build
       run: cargo build --verbose
+
     - name: Run tests
       run: cargo test --verbose
