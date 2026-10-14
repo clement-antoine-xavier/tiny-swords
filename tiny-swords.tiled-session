@@ -1,0 +1,39 @@
+{
+    "activeFile": "assets/Main.tmx",
+    "expandedProjectPaths": [
+        "assets/Terrain",
+        "assets",
+        ".",
+        "assets/Terrain/Tileset"
+    ],
+    "fileStates": {
+        "assets/Main.tmx": {
+            "scale": 0.6642,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 145.28756398675097,
+                "y": 79.04245709123757
+            }
+        },
+        "assets/Terrain/Tileset/Tilemap_color1.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "/Users/clement/clement-antoine-xavier/tiny-swords/assets/Terrain/Tileset",
+    "map.lastUsedFormat": "tmx",
+    "openFiles": [
+        "assets/Terrain/Tileset/Tilemap_color1.tsx",
+        "assets/Main.tmx"
+    ],
+    "project": "tiny-swords.tiled-project",
+    "recentFiles": [
+        "assets/Terrain/Tileset/Tilemap_color1.tsx",
+        "assets/Main.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 64,
+        "width": 64
+    }
+}

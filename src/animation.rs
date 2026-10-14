@@ -12,6 +12,8 @@ use std::time::Duration;
 
 use bevy::prelude::*;
 
+use crate::assets::ANIM_FPS;
+
 /// The animations the Warrior can play.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum AnimId {
@@ -33,11 +35,11 @@ struct AnimSpec {
 impl AnimId {
     fn spec(self) -> AnimSpec {
         match self {
-            AnimId::Idle => AnimSpec { first: 0, last: 7, fps: 8, looping: true },
-            AnimId::Run => AnimSpec { first: 0, last: 5, fps: 12, looping: true },
-            AnimId::Guard => AnimSpec { first: 0, last: 5, fps: 8, looping: true },
-            AnimId::Attack1 => AnimSpec { first: 0, last: 3, fps: 12, looping: false },
-            AnimId::Attack2 => AnimSpec { first: 0, last: 3, fps: 12, looping: false },
+            AnimId::Idle => AnimSpec { first: 0, last: 7, fps: ANIM_FPS, looping: true },
+            AnimId::Run => AnimSpec { first: 0, last: 5, fps: ANIM_FPS, looping: true },
+            AnimId::Guard => AnimSpec { first: 0, last: 5, fps: ANIM_FPS, looping: true },
+            AnimId::Attack1 => AnimSpec { first: 0, last: 3, fps: ANIM_FPS, looping: false },
+            AnimId::Attack2 => AnimSpec { first: 0, last: 3, fps: ANIM_FPS, looping: false },
         }
     }
 }
@@ -60,10 +62,10 @@ impl Default for AnimationConfig {
             current: None,
             first: 0,
             last: 0,
-            fps: 8,
+            fps: ANIM_FPS,
             looping: true,
             finished: false,
-            frame_timer: Self::timer_from_fps(8),
+            frame_timer: Self::timer_from_fps(ANIM_FPS),
         }
     }
 }

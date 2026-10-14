@@ -14,7 +14,9 @@ impl Plugin for CameraPlugin {
 }
 
 fn spawn_camera(mut commands: Commands) {
-    commands.spawn((Camera2d, Transform::from_xyz(0.0, 0.0, 999.0)));
+    // Keep the camera on the origin in z as well: `Camera2d` sees the window
+    // `(-1000, 1000]`, so the player (z = 1) and the map layers (z < 0) all fit.
+    commands.spawn((Camera2d, Transform::from_xyz(0.0, 0.0, 0.0)));
 }
 
 fn follow_player(

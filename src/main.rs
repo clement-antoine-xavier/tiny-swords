@@ -1,12 +1,15 @@
 mod animation;
+mod assets;
 mod camera;
 mod player;
+mod tilemap;
 
 use bevy::prelude::*;
 
 use animation::AnimationPlugin;
 use camera::CameraPlugin;
 use player::PlayerPlugin;
+use tilemap::TilemapPlugin;
 
 fn main() {
     App::new()
@@ -24,6 +27,6 @@ fn main() {
                 }),
         )
         .insert_resource(ClearColor(Color::srgb(0.30, 0.55, 0.35)))
-        .add_plugins((PlayerPlugin, AnimationPlugin, CameraPlugin))
+        .add_plugins((PlayerPlugin, AnimationPlugin, CameraPlugin, TilemapPlugin))
         .run();
 }

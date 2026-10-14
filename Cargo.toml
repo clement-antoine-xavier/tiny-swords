@@ -6,6 +6,10 @@ edition = "2024"
 [dependencies]
 bevy = "0.20.0"
 
+# Parses the Tiled map authored in assets/Main.tmx (no Bevy dependency, so it
+# works regardless of the engine version).
+tiled = "0.16"
+
 # Enable a small amount of optimization in the dev profile.
 [profile.dev]
 opt-level = 1
